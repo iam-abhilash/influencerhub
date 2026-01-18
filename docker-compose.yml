@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./backend
+    container_name: influencerhub-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    # For local dev, mount the volume so we don't rebuild on every change
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - influencerhub-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: influencerhub-frontend
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    environment:
+      - API_URL=http://backend:8000
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    networks:
+      - influencerhub-network
+
+networks:
+  influencerhub-network:
+    driver: bridge

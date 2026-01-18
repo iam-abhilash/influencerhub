@@ -1,0 +1,99 @@
+name: InfluencerHub CI/CD
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  # ===================================================
+  # 1. Backend Quality Gate
+  # ===================================================
+  backend-test:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+        cache: 'pip'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest bandit httpx pytest-asyncio
+
+    - name: Run Security Audit (Bandit)
+      run: |
+        # recursive scan, skip B101 (assert used in pytest)
+        bandit -r app/ -s B101 
+
+    - name: Run Unit & Integration Tests
+      env:
+        # Mock Secrets for CI (Do not use real keys here)
+        JWT_SECRET: "test-secret-for-ci-pipeline-only"
+        SUPABASE_URL: "https://mock.supabase.co"
+        SUPABASE_KEY: "mock-key"
+      run: |
+        pytest tests/
+
+  # ===================================================
+  # 2. Frontend Smoke Test
+  # ===================================================
+  frontend-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    
+    - name: Install Dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install playwright pytest-playwright
+    
+    - name: Install Playwright Browsers
+      run: playwright install chromium
+
+    - name: Run Frontend Tests (Mocked)
+      # In a real CI, you'd spin up the backend container + frontend container
+      # For now, we perform a static check or basic unit test
+      run: |
+        # echo "Running Placeholder Frontend Tests"
+        # pytest tests/
+        echo "Skipping E2E in CI until container orchestration is set up"
+
+  # ===================================================
+  # 3. Build Docker Images (Prepare for Staging)
+  # ===================================================
+  build-images:
+    needs: [backend-test, frontend-check]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build Backend Image
+      run: |
+        docker build -t influencerhub-backend:latest ./backend
+    
+    - name: Build Frontend Image
+      run: |
+        docker build -t influencerhub-frontend:latest ./frontend
