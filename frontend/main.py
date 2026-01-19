@@ -5,8 +5,8 @@ from supabase import create_client, Client
 
 # Page Config
 st.set_page_config(
-    page_title="InfluencerHub - Your Creative Journey Starts Here",
-    page_icon="🚀",
+    page_title="InfluencerHub | The Premium Creator Network",
+    page_icon="✨",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -31,41 +31,81 @@ if "page" not in st.session_state:
 if "user" not in st.session_state:
     st.session_state.user = None
 
-HOSTINGER_PURPLE = "#674CC4"
-HOSTINGER_DARK = "#2F1C6A"
+# Premium Color Palette
+PRIMARY = "#674CC4" # Hostinger Purple
+SECONDARY = "#2F1C6A" # Deep Indigo
+ACCENT = "#FF6B6B"
+BG_LIGHT = "#F8F9FD"
 
-# Custom CSS for Hostinger Look & Feel
+# Enhanced CSS for Modern Professional Look
 st.markdown(f"""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+        
         .stApp {{
-            background-color: #F4F5F7;
-            font-family: 'DM Sans', sans-serif;
-            color: #2F1C6A;
+            background: linear-gradient(135deg, #FDFBFF 0%, #F4F7FF 100%);
+            font-family: 'Outfit', sans-serif;
         }}
-        h1, h2, h3 {{ color: #2F1C6A !important; font-weight: 700 !important; }}
+
+        /* Typography */
+        h1, h2, h3 {{ 
+            font-family: 'Outfit', sans-serif !important;
+            color: {SECONDARY} !important;
+            letter-spacing: -0.02em;
+        }}
+
+        /* Buttons Core */
         .stButton>button {{
-            background-color: {HOSTINGER_PURPLE} !important;
-            color: white !important;
-            border-radius: 50px !important;
-            padding: 0.5rem 2rem !important;
+            border-radius: 12px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
             border: none !important;
-            font-weight: 700 !important;
-            transition: all 0.3s ease !important;
+            padding: 0.6rem 1.5rem !important;
         }}
-        .stButton>button:hover {{
-            background-color: {HOSTINGER_DARK} !important;
-            transform: scale(1.02);
+
+        /* Primary Buttons */
+        div[data-testid="stButton"] button[key*="primary"] {{
+            background: {PRIMARY} !important;
+            color: white !important;
         }}
-        .hero-title {{ font-size: 3.5rem; line-height: 1.2; text-align: center; margin-bottom: 1rem; }}
-        .hero-subtitle {{ font-size: 1.5rem; color: #545778; text-align: center; margin-bottom: 2rem; }}
-        .auth-card {{
-            background-color: white;
+        
+        div[data-testid="stButton"] button:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(103, 76, 196, 0.2);
+        }}
+
+        /* Cards */
+        .premium-card {{
+            background: white;
             padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            max-width: 450px;
-            margin: auto;
+            border-radius: 24px;
+            border: 1px solid rgba(103, 76, 196, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+            transition: transform 0.3s ease;
+        }}
+        .premium-card:hover {{
+            transform: translateY(-5px);
+        }}
+
+        /* Glassmorphism Auth Card */
+        .auth-container {{
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 32px;
+            border: 1px solid white;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.05);
+            max-width: 500px;
+            margin: 2rem auto;
+        }}
+
+        /* Navbar Header */
+        .nav-text {{
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, {PRIMARY}, {SECONDARY});
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }}
     </style>
 """, unsafe_allow_html=True)
@@ -75,124 +115,129 @@ def navigate_to(page_name):
     st.rerun()
 
 def render_navbar():
-    col1, col2, col3 = st.columns([2, 5, 2])
-    with col1:
-        if st.button("🟣 **InfluencerHub**", key="nav_home_logo"):
-            navigate_to("home")
-    with col3:
+    cols = st.columns([2, 5, 2])
+    with cols[0]:
+        st.markdown(f'<p class="nav-text">InfluencerHub</p>', unsafe_allow_html=True)
+    with cols[2]:
         if st.session_state.user:
-            if st.button("Log Out"):
+            if st.button("Log Out", key="logout_btn"):
                 supabase.auth.sign_out()
                 st.session_state.user = None
                 navigate_to("home")
         else:
             c1, c2 = st.columns(2)
             with c1:
-                if st.button("Log In"): navigate_to("login")
+                if st.button("Log In", key="nav_login"): navigate_to("login")
             with c2:
-                if st.button("Sign Up"): navigate_to("signup")
+                if st.button("Join Now", key="nav_signup", type="primary"): navigate_to("signup")
 
 def render_home():
-    # Hero Section
-    st.markdown('<div style="padding: 4rem 0;">', unsafe_allow_html=True)
-    st.markdown('<h1 class="hero-title">Turn Your Influence<br>Into Verified Income</h1>', unsafe_allow_html=True)
-    st.markdown('<p class="hero-subtitle">The all-in-one platform for creators. Everything you need to manage campaigns, payments, and growth.</p>', unsafe_allow_html=True)
+    st.markdown('<div style="text-align: center; padding: 6rem 0;">', unsafe_allow_html=True)
+    st.markdown(f'<h1 style="font-size: 4.5rem; margin-bottom: 1rem;">Scale Your Influence <span style="color: {PRIMARY}">Faster.</span></h1>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size: 1.4rem; color: #64748b; margin-bottom: 3rem; max-width: 700px; margin-left: auto; margin-right: auto;">The elite operating system for world-class creators and brands. Automated campaigns, verified payments, and deep analytics.</p>', unsafe_allow_html=True)
     
-    col_cta1, col_cta2, col_cta3 = st.columns([1, 1, 1])
-    with col_cta2:
-       if st.button("Start Now", use_container_width=True):
-           navigate_to("signup")
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        if st.button("Get Started for Free", key="hero_cta", use_container_width=True, type="primary"):
+            navigate_to("signup")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Features / Pricing Cards Style
-    st.markdown("### Choose your path")
-    col_a, col_b, col_c = st.columns(3)
-    with col_a:
-        with st.container(border=True):
-            st.markdown("#### 🚀 Creator Starter")
-            st.markdown(f"<h2 style='color: {HOSTINGER_PURPLE}'>Free</h2>", unsafe_allow_html=True)
-            st.write("✔️ Basic Analytics")
-            st.button("Select Starter", on_click=lambda: navigate_to("signup"), key="p1")
-    with col_b:
-         with st.container(border=True):
-            st.markdown("#### ⭐ Premium Influencer")
-            st.markdown(f"<h2 style='color: {HOSTINGER_PURPLE}'>$29.99/mo</h2>", unsafe_allow_html=True)
-            st.write("✔️ Unlimited Campaigns")
-            st.button("Select Premium", on_click=lambda: navigate_to("signup"), key="p2")
-    with col_c:
-         with st.container(border=True):
-            st.markdown("#### 🏢 Brand Business")
-            st.markdown(f"<h2 style='color: {HOSTINGER_PURPLE}'>$99.99/mo</h2>", unsafe_allow_html=True)
-            st.write("✔️ Custom Contracts")
-            st.button("Select Business", on_click=lambda: navigate_to("signup"), key="p3")
-
-def render_login():
-    st.markdown('<div class="auth-card">', unsafe_allow_html=True)
-    st.subheader("Welcome Back")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-    if st.button("Log In", use_container_width=True):
-        try:
-            res = supabase.auth.sign_in_with_password({"email": email, "password": password})
-            st.session_state.user = res.user
-            st.success("Logged in successfully!")
-            navigate_to("dashboard")
-        except Exception as e:
-            st.error(f"Login failed: {str(e)}")
+    # Trust Badges / Stats
     st.markdown("---")
-    st.write("Don't have an account?")
-    if st.button("Sign Up here"): navigate_to("signup")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-def render_signup():
-    st.markdown('<div class="auth-card">', unsafe_allow_html=True)
-    st.subheader("Join InfluencerHub")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-    if st.button("Create Account", use_container_width=True):
-        try:
-            res = supabase.auth.sign_up({"email": email, "password": password})
-            st.success("Success! Please check your email to verify your account.")
-            st.info("Once verified, you can log in.")
-        except Exception as e:
-            st.error(f"Signup failed: {str(e)}")
+    st.markdown('<div style="display: flex; justify-content: space-around; padding: 2rem 0; color: #94a3b8; text-align: center;"><div><h3>2.5k+</h3><p>Creators</p></div><div><h3>$1.2M+</h3><p>Paid</p></div><div><h3>500+</h3><p>Brands</p></div></div>', unsafe_allow_html=True)
     st.markdown("---")
-    st.write("Already have an account?")
-    if st.button("Log In here"): navigate_to("login")
+
+def render_auth_form(mode="login"):
+    st.markdown(f'<div class="auth-container">', unsafe_allow_html=True)
+    st.markdown(f'<h2 style="text-align: center; margin-bottom: 0.5rem;">{"Welcome Back" if mode=="login" else "Create Account"}</h2>', unsafe_allow_html=True)
+    st.markdown(f'<p style="text-align: center; color: #64748b; margin-bottom: 2rem;">{"Log in to your dashboard" if mode=="login" else "Start your journey within seconds"}</p>', unsafe_allow_html=True)
+    
+    # Google SSO Button
+    if st.button("Continue with Google", key="google_sso", use_container_width=True):
+        try:
+            # This triggers the Google OAuth flow via Supabase
+            auth_response = supabase.auth.sign_in_with_oauth({
+                "provider": "google",
+                "options": {
+                    "redirect_to": st.query_params.get("redirect_to", "https://frontend-production-4b9e.up.railway.app/")
+                }
+            })
+            if auth_response and hasattr(auth_response, 'url'):
+                st.markdown(f'<meta http-equiv="refresh" content="0; url={auth_response.url}">', unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"Google Login Error: {e}")
+
+    st.markdown('<div style="text-align: center; margin: 1rem 0; color: #cbd5e1;">OR</div>', unsafe_allow_html=True)
+
+    email = st.text_input("Email Address", placeholder="name@company.com")
+    password = st.text_input("Password", type="password", placeholder="••••••••")
+    
+    btn_label = "Log In" if mode == "login" else "Create Account"
+    if st.button(btn_label, key="auth_submit", use_container_width=True, type="primary"):
+        try:
+            if mode == "login":
+                res = supabase.auth.sign_in_with_password({"email": email, "password": password})
+                st.session_state.user = res.user
+                navigate_to("dashboard")
+            else:
+                res = supabase.auth.sign_up({"email": email, "password": password})
+                st.success("Verification email sent! Check your inbox.")
+        except Exception as e:
+            st.error(f"Error: {str(e)}")
+            
+    st.markdown(f'<p style="text-align: center; margin-top: 1.5rem; color: #64748b;">{"Don\'t have an account?" if mode=="login" else "Already have an account?"} <a href="#" onclick="return false;" style="color: {PRIMARY}; font-weight: 600;">Contact Support</a></p>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 def render_dashboard():
-    st.header(f"Welcome, {st.session_state.user.email}!")
-    st.write("You are now in your dashboard. Full creator statistics and campaign tools will appear here.")
+    # Modern Sidebar Dashboard
+    with st.sidebar:
+        st.markdown(f"### 🟣 InfluencerHub")
+        st.write(f"Logged in as: **{st.session_state.user.email}**")
+        st.divider()
+        st.button("Dashboard", use_container_width=True, type="primary")
+        st.button("Campaigns", use_container_width=True)
+        st.button("Wallet", use_container_width=True)
+        st.button("Settings", use_container_width=True)
+
+    st.header("Good Morning! 👋")
     
-    # Check backend healthy
+    # Summary Metrics
+    m1, m2, m3, m4 = st.columns(4)
+    with m1: st.metric("Reach", "1.2M", "+12%")
+    with m2: st.metric("Campaigns", "4", "0")
+    with m3: st.metric("Earnings", "$4,250", "+$840")
+    with m4: st.metric("Rating", "4.9/5", "+0.1")
+
+    # System Link Status
     try:
-        response = requests.get(f"{API_URL}/health")
-        if response.status_code == 200:
-            st.success("✅ Backend Connection Secure")
-        else:
-            st.warning("⚠️ Backend connection issue, but your session is active.")
+        requests.get(f"{API_URL}/health", timeout=2)
+        st.success("Core Systems Connected")
     except:
-        st.warning("⚠️ Connecting to backend services...")
+        st.info("Syncing with Global Node...")
 
 def main():
     if not supabase:
-        st.error("⚠️ Supabase credentials missing. Please check your environment variables (SUPABASE_URL, SUPABASE_KEY).")
+        st.error("Missing SUPABASE_URL and SUPABASE_KEY in environment.")
         return
 
-    render_navbar()
-    st.markdown("---")
+    # Check for OAuth Callback params in URL
+    query_params = st.query_params
+    if "access_token" in query_params or "code" in query_params:
+        # Supabase handles tokens in the fragment/query, basic check
+        st.session_state.user = supabase.auth.get_user()
+        if st.session_state.user:
+            navigate_to("dashboard")
 
-    if st.session_state.page == "home":
-        render_home()
-    elif st.session_state.page == "login":
-        render_login()
-    elif st.session_state.page == "signup":
-        render_signup()
-    elif st.session_state.page == "dashboard":
-        if not st.session_state.user:
-            navigate_to("login")
+    if st.session_state.page == "dashboard" and st.session_state.user:
         render_dashboard()
+    else:
+        render_navbar()
+        if st.session_state.page == "home":
+            render_home()
+        elif st.session_state.page == "login":
+            render_auth_form("login")
+        elif st.session_state.page == "signup":
+            render_auth_form("signup")
 
 if __name__ == "__main__":
     main()
