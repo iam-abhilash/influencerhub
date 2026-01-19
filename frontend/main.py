@@ -52,11 +52,11 @@ st.markdown(f"""
 
         /* Hero Section Styling */
         .hero-bg {{
-            background: linear-gradient(rgba(5,5,5,0.7), rgba(5,5,5,0.7)), 
-                        url('https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=2574&auto=format&fit=crop');
+            background: linear-gradient(rgba(5,5,5,0.73), rgba(5,5,5,0.73)), 
+                        url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2672&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            padding: 10rem 10%;
+            padding: 12rem 10%;
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }}
