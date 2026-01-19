@@ -178,52 +178,91 @@ def render_home():
         st.markdown('</div>', unsafe_allow_html=True)
 
 def render_auth(mode="login"):
-    st.markdown('<div style="background-color: #000000; padding: 10rem 0; min-height: 100vh;">', unsafe_allow_html=True)
-    _, col, _ = st.columns([1, 1.2, 1])
+    # Immersive Auth Background
+    auth_bg = "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2601&auto=format&fit=crop" if mode=="login" else "https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=2601&auto=format&fit=crop"
+    
+    st.markdown(f"""
+        <div style="background: linear-gradient(rgba(5,5,5,0.8), rgba(5,5,5,0.8)), url('{auth_bg}'); 
+                    background-size: cover; background-position: center; min-height: 100vh; padding-top: 5rem;">
+    """, unsafe_allow_html=True)
+    
+    _, col, _ = st.columns([1, 1, 1])
     with col:
-        st.markdown(f'<div style="background: #111; padding: 4rem; border-radius: 40px; border: 1px solid rgba(255,255,255,0.05);">', unsafe_allow_html=True)
-        st.markdown(f"<h1 style='text-align: center; margin-bottom: 2rem;'>{'Welcome back' if mode=='login' else 'Create Identity'}</h1>", unsafe_allow_html=True)
+        st.markdown(f'<div class="excellence-card" style="margin-top: 2rem;">', unsafe_allow_html=True)
+        st.markdown(f"<h1 style='text-align: center; font-size: 2.5rem;'>{'Secure Access' if mode=='login' else 'System Entry'}</h1>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align: center; opacity: 0.6; margin-bottom: 2rem;'>InfluencerHub Institutional Portal</p>", unsafe_allow_html=True)
         
-        email = st.text_input("Corporate Email", placeholder="name@company.com", key=f"{mode}_email")
-        password = st.text_input("Secret Key", type="password", placeholder="••••••••", key=f"{mode}_pass")
+        email = st.text_input("Corporate Identifier", placeholder="name@company.com", key=f"{mode}_email")
+        password = st.text_input("Access Token", type="password", placeholder="••••••••", key=f"{mode}_pass")
         
         if mode == "signup":
-            if st.button("Establish Identity"):
+            if st.button("Initialize Account", key="auth_btn"):
                 try:
                     res = supabase.auth.sign_up({"email": email, "password": password})
-                    st.success("Verification packet sent. Check your secure inbox.")
-                except Exception as e: st.error(f"Handshake failed: {e}")
+                    st.success("Verification packet dispatched. Check your inbox.")
+                except Exception as e: st.error(f"Initialization failed: {e}")
         else:
-            if st.button("Access Mission Control"):
+            if st.button("Enter Network", key="auth_btn"):
                 try:
                     res = supabase.auth.sign_in_with_password({"email": email, "password": password})
                     st.session_state.user = res.user
                     navigate_to("dashboard"); st.rerun()
-                except: st.error("Access denied. Invalid credentials.")
+                except: st.error("Access Denied. Check credentials.")
         
-        st.markdown("<br><p style='text-align:center; opacity: 0.3;'>———</p>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
         if mode == "login":
-            if st.button("New to the network? Join here", key="go_s"): navigate_to("signup"); st.rerun()
+            if st.button("Request Network Access", key="secondary_auth"): navigate_to("signup"); st.rerun()
         else:
-            if st.button("Existing identifier? Login", key="go_l"): navigate_to("login"); st.rerun()
+            if st.button("Existing Participant? Login", key="secondary_auth"): navigate_to("login"); st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 def render_dashboard():
-    # Modern Dashboard Layout
-    st.markdown('<div style="padding: 4rem 10%;">', unsafe_allow_html=True)
-    st.markdown(f"<h1>Mission Control <span style='font-size: 1.2rem; color: {ACCENT};'>v1.0.4</span></h1>", unsafe_allow_html=True)
-    st.write(f"Authorized Participant: **{st.session_state.user.email}**")
-    st.divider()
+    # Premium Dashboard Background
+    st.markdown(f"""
+        <div style="background: linear-gradient(rgba(5,5,5,0.9), rgba(5,5,5,0.9)), 
+                    url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2670&auto=format&fit=crop'); 
+                    background-size: cover; min-height: 100vh; padding: 4rem 10%;">
+    """, unsafe_allow_html=True)
     
-    m1, m2, m3 = st.columns(3)
-    with m1: st.metric("Portfolio Value", "$24,580", "+12.4%")
-    with m2: st.metric("Global Reach", "1.4M", "+3.1%")
-    with m3: st.metric("Trust Score", "9.8/10", "+0.2")
-
-    st.markdown('<div style="height: 100px;"></div>', unsafe_allow_html=True)
-    if st.button("Terminate Session", key="logout_dash"):
-        supabase.auth.sign_out(); st.session_state.user = None; navigate_to("home"); st.rerun()
+    col_dash, col_profile = st.columns([3, 1])
+    
+    with col_dash:
+        st.markdown(f"<h1>Mission Control <span style='font-size: 1.2rem; color: {ACCENT}; opacity: 0.8;'>NODE_774</span></h1>", unsafe_allow_html=True)
+        st.markdown(f"<p style='opacity: 0.6;'>Authenticated Participant: {st.session_state.user.email}</p>", unsafe_allow_html=True)
+        st.divider()
+        
+        # Grid of Metrics
+        m1, m2, m3 = st.columns(3)
+        with m1: 
+            st.markdown('<div class="excellence-card" style="padding: 1.5rem;">', unsafe_allow_html=True)
+            st.metric("Total Yield", "$24.5k", "+12%")
+            st.markdown('</div>', unsafe_allow_html=True)
+        with m2: 
+            st.markdown('<div class="excellence-card" style="padding: 1.5rem;">', unsafe_allow_html=True)
+            st.metric("Ad Velocity", "94.2", "+2.4")
+            st.markdown('</div>', unsafe_allow_html=True)
+        with m3: 
+            st.markdown('<div class="excellence-card" style="padding: 1.5rem;">', unsafe_allow_html=True)
+            st.metric("Network Trust", "9.8", "Elite")
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("### Active Directives")
+        with st.container(border=True):
+            st.info("System initializing... Connect your first social stream to begin ingest.")
+            
+    with col_profile:
+        st.markdown('<div class="excellence-card" style="text-align: center;">', unsafe_allow_html=True)
+        st.markdown(f"<h1 style='font-size: 4rem;'>👑</h1>", unsafe_allow_html=True)
+        st.markdown(f"<h4>Creator Tier 1</h4>", unsafe_allow_html=True)
+        st.markdown(f"<p style='opacity: 0.5;'>ID: {st.session_state.user.id[:8]}...</p>", unsafe_allow_html=True)
+        if st.button("Terminate Session", key="logout_btn"):
+            supabase.auth.sign_out()
+            st.session_state.user = None
+            navigate_to("home"); st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+        
     st.markdown('</div>', unsafe_allow_html=True)
 
 def main():
