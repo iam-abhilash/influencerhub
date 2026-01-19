@@ -176,7 +176,14 @@ def render_auth(mode="login"):
             if mode == "signup":
                 if st.button("Establish Account", use_container_width=True):
                     try:
-                        supabase.auth.sign_up({"email": email, "password": password})
+                        # Explicitly tell Supabase to redirect to the live site after email confirmation
+                        res = supabase.auth.sign_up({
+                            "email": email, 
+                            "password": password,
+                            "options": {
+                                "email_redirect_to": "https://frontend-production-4b9e.up.railway.app"
+                            }
+                        })
                         st.success("✅ Handshake initiated. Check your inbox.")
                     except Exception as e: st.error(str(e))
                 st.markdown("<br>", unsafe_allow_html=True)
