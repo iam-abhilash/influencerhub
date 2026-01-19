@@ -107,7 +107,8 @@ st.markdown(f"""
 
 def navigate_to(page_name):
     st.session_state.page = page_name
-    st.rerun()
+    # st.rerun() is often redundant in callbacks and causes a no-op warning.
+    # We will let Streamlit's natural rerun handle it after the state change.
 
 def render_navbar():
     cols = st.columns([3, 6, 2])
@@ -115,12 +116,15 @@ def render_navbar():
         st.markdown('<p class="logo-text">InfluencerHub</p>', unsafe_allow_html=True)
     with cols[2]:
         if st.session_state.user:
-            if st.button("Log Out"):
+            if st.button("Log Out", key="nav_logout_btn"):
                 supabase.auth.sign_out()
                 st.session_state.user = None
                 navigate_to("home")
+                st.rerun()
         elif st.session_state.page == "home":
-             st.button("Log In", key="nav_login_top", on_click=lambda: navigate_to("login"))
+             if st.button("Log In", key="nav_login_top"):
+                 navigate_to("login")
+                 st.rerun()
 
 def render_home():
     st.markdown('<div style="text-align: center; padding: 6rem 0;">', unsafe_allow_html=True)
@@ -129,7 +133,9 @@ def render_home():
     
     c1, c2, c3 = st.columns([1,1,1])
     with c2:
-        st.button("Start Your Journey", key="hero_start_primary", on_click=lambda: navigate_to("signup"))
+        if st.button("Start Your Journey", key="hero_start_primary"):
+            navigate_to("signup")
+            st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
 def render_auth(mode="login"):
@@ -155,13 +161,18 @@ def render_auth(mode="login"):
                     res = supabase.auth.sign_in_with_password({"email": email, "password": password})
                     st.session_state.user = res.user
                     navigate_to("dashboard")
+                    st.rerun()
                 except Exception as e: st.error("Invalid login. Try again.")
         
         st.markdown("<br>", unsafe_allow_html=True)
         if mode == "login":
-            st.button("Don't have an account? Sign Up", on_click=lambda: navigate_to("signup"))
+            if st.button("Don't have an account? Sign Up"):
+                navigate_to("signup")
+                st.rerun()
         else:
-            st.button("Already have an account? Log In", on_click=lambda: navigate_to("login"))
+            if st.button("Already have an account? Log In"):
+                navigate_to("login")
+                st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
 def render_dashboard():
