@@ -5,8 +5,8 @@ from supabase import create_client, Client
 
 # Page Config
 st.set_page_config(
-    page_title="InfluencerHub | Elite Creator Network",
-    page_icon="👑",
+    page_title="InfluencerHub | The Global Standard for Creators",
+    page_icon="💎",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -31,73 +31,89 @@ if "page" not in st.session_state:
 if "user" not in st.session_state:
     st.session_state.user = None
 
-# Premium Color Palette
-PRIMARY = "#674CC4" 
-SECONDARY = "#2F1C6A"
+# Excellence Color Palette
+PRIMARY = "#674CC4"
+ACCENT = "#A78BFA"
+DARK_BG = "#050505"
 
-# High-End CSS Injection
+# Ultra-Premium CSS
 st.markdown(f"""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap');
         
         [data-testid="stHeader"] {{ display: none !important; }}
-        .block-container {{ padding-top: 1rem !important; }}
+        .block-container {{ padding: 0 !important; max-width: 100% !important; }}
         
         .stApp {{
-            background-color: #0B0E14;
-            color: #E2E8F0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: {DARK_BG};
+            color: #FFFFFF;
+            font-family: 'Outfit', sans-serif;
+        }}
+
+        /* Hero Section Styling */
+        .hero-bg {{
+            background: linear-gradient(rgba(5,5,5,0.7), rgba(5,5,5,0.7)), 
+                        url('https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=2574&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            padding: 10rem 10%;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }}
 
         .logo-text {{
-            font-size: 3rem !important; 
-            background: linear-gradient(135deg, #A78BFA 0%, #674CC4 100%);
+            font-size: 3.5rem !important; 
+            background: linear-gradient(90deg, #FFFFFF 0%, {ACCENT} 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 800;
-            letter-spacing: -0.05em;
-            display: inline-block;
+            letter-spacing: -0.06em;
         }}
 
-        .hero-card {{
+        .excellence-card {{
             background: rgba(255, 255, 255, 0.03);
-            border-radius: 32px;
-            padding: 4rem;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            margin-bottom: 2rem;
-            overflow: hidden;
-            position: relative;
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }}
+        .excellence-card:hover {{
+            transform: translateY(-10px);
+            border-color: {PRIMARY};
+            background: rgba(255, 255, 255, 0.05);
         }}
 
         .stButton>button {{
             width: 100% !important;
-            border-radius: 12px !important;
+            border-radius: 100px !important;
             font-weight: 700 !important;
             background: {PRIMARY} !important;
             color: white !important;
             border: none !important;
-            height: 3.5rem !important;
+            height: 4rem !important;
+            font-size: 1.2rem !important;
             transition: all 0.3s ease !important;
         }}
-        .stButton>button:hover {{
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(103, 76, 196, 0.5) !important;
+        
+        /* Navigation Style */
+        .nav-container {{
+            padding: 1.5rem 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5,5,5,0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }}
 
         .stTextInput input {{
             background-color: #FFFFFF !important;
             color: #000000 !important;
-            border-radius: 12px !important;
-            padding: 12px !important;
-        }}
-
-        .feature-image {{
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            transition: transform 0.5s ease;
-        }}
-        .feature-image:hover {{
-            transform: scale(1.02);
+            border-radius: 15px !important;
+            height: 3.5rem !important;
         }}
     </style>
 """, unsafe_allow_html=True)
@@ -106,90 +122,112 @@ def navigate_to(page_name):
     st.session_state.page = page_name
 
 def render_navbar():
-    cols = st.columns([3, 6, 2])
+    cols = st.columns([4, 4, 3])
     with cols[0]:
         st.markdown('<p class="logo-text">InfluencerHub</p>', unsafe_allow_html=True)
     with cols[2]:
         if st.session_state.user:
-            if st.button("Log Out", key="nav_logout"):
+            if st.button("Logout", key="nav_logout"):
                 supabase.auth.sign_out()
                 st.session_state.user = None
-                navigate_to("home")
-                st.rerun()
-        elif st.session_state.page == "home":
-             if st.button("Log In", key="nav_login"):
-                 navigate_to("login")
-                 st.rerun()
+                navigate_to("home"); st.rerun()
+        else:
+            c1, c2 = st.columns(2)
+            with c1: 
+                if st.button("Login", key="nav_login"): navigate_to("login"); st.rerun()
+            with c2: 
+                if st.button("Start Free", key="nav_signup"): navigate_to("signup"); st.rerun()
 
 def render_home():
-    # Hero Section with Image
-    col1, col2 = st.columns([1, 1], gap="large")
-    with col1:
-        st.markdown('<div style="padding: 4rem 0;">', unsafe_allow_html=True)
-        st.markdown('<h1 style="font-size: 5rem; line-height: 1.1; margin-bottom: 1.5rem;">MONETIZE YOUR<br><span style="color: #A78BFA">CREATIVE EDGE.</span></h1>', unsafe_allow_html=True)
-        st.markdown('<p style="font-size: 1.4rem; color: #94A3B8; margin-bottom: 3rem;">The all-in-one institutional engine for creators to manage massive campaigns, secure smart contracts, and track institutional-grade analytics.</p>', unsafe_allow_html=True)
-        if st.button("Sign Up Now — It's Free", key="hero_cta"):
-            navigate_to("signup")
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    with col2:
-        st.image("https://raw.githubusercontent.com/Abhibatch/InfluencerHub/main/creator_platform_hero.png", use_container_width=True)
+    # Hero Section
+    st.markdown(f"""
+        <div class="hero-bg">
+            <h1 style="font-size: 6rem; font-weight: 800; line-height: 1; margin-bottom: 1rem;">ELITE OPERATING <br><span style="color: {ACCENT}">SYSTEM</span> FOR CREATORS.</h1>
+            <p style="font-size: 1.6rem; color: rgba(255,255,255,0.7); max-width: 800px; margin: 0 auto 3rem auto;">
+                Bridge the gap between influence and institutional income. Manage high-stakes campaigns with verified smart contracts and bank-grade analytics.
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    # Values Section
+    st.markdown('<div style="padding: 6rem 10%;">', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; font-size: 3rem; margin-bottom: 4rem;">Built for Excellence</h2>', unsafe_allow_html=True)
     
-    # Feature Section with Dashboard Preview
-    col_feat1, col_feat2 = st.columns([1, 1], gap="large")
-    with col_feat1:
-        st.image("https://raw.githubusercontent.com/Abhibatch/InfluencerHub/main/analytics_dashboard_preview.png", use_container_width=True)
+    col1, col2, col3 = st.columns(3, gap="large")
     
-    with col_feat2:
-        st.markdown('<div style="padding: 4rem 0;">', unsafe_allow_html=True)
-        st.markdown('## Institutional Analytics')
-        st.markdown('<p style="font-size: 1.2rem; color: #94A3B8;">Stop guessing. Start growing with metrics that matter. Our AI-driven dashboard gives you the same tools used by billion-dollar brands.</p>', unsafe_allow_html=True)
-        st.markdown('✔️ Real-time Reach Tracking<br>✔️ Audience Sentiment Analysis<br>✔️ Predictive Earnings Engine', unsafe_allow_html=True)
+    with col1:
+        st.markdown(f'<div class="excellence-card"><h1 style="font-size: 3.5rem;">🌎</h1><h3>Global Reach</h3><p style="color: rgba(255,255,255,0.6);">Connect with Tier-1 brands across North America, Europe, and Asia instantly.</p></div>', unsafe_allow_html=True)
+    with col2:
+        st.markdown(f'<div class="excellence-card"><h1 style="font-size: 3.5rem;">⛓️</h1><h3>Smart Identity</h3><p style="color: rgba(255,255,255,0.6);">Your metrics are on-chain verified. No more screenshots, no more manual reporting.</p></div>', unsafe_allow_html=True)
+    with col3:
+        st.markdown(f'<div class="excellence-card"><h1 style="font-size: 3.5rem;">💰</h1><h3>Instant Payouts</h3><p style="color: rgba(255,255,255,0.6);">Payments are escrowed. The moment you post, your funds are released.</p></div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Immersive Feature Section
+    col_img, col_txt = st.columns([1.2, 1], gap="large")
+    with col_img:
+        st.markdown('<div style="padding-left: 10%;">', unsafe_allow_html=True)
+        st.image("https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop", use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    with col_txt:
+        st.markdown('<div style="padding-top: 5rem; padding-right: 15%;">', unsafe_allow_html=True)
+        st.markdown('<h2 style="font-size: 3.5rem;">Institutional Analytics</h2>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size: 1.3rem; color: rgba(255,255,255,0.7);">Experience the power of real-time data ingestion. Track sentiment, engagement velocity, and conversion attribution in a single pane of glass.</p>', unsafe_allow_html=True)
+        if st.button("Join the Ecosystem", key="feat_cta"):
+            navigate_to("signup"); st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
 def render_auth(mode="login"):
+    st.markdown('<div style="background-color: #000000; padding: 10rem 0; min-height: 100vh;">', unsafe_allow_html=True)
     _, col, _ = st.columns([1, 1.2, 1])
     with col:
-        st.markdown(f'<div style="background: #161B22; padding: 3rem; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); margin-top: 4rem;">', unsafe_allow_html=True)
-        st.markdown(f"<h2 style='text-align: center;'>{'Welcome Back' if mode=='login' else 'Create Account'}</h2>", unsafe_allow_html=True)
+        st.markdown(f'<div style="background: #111; padding: 4rem; border-radius: 40px; border: 1px solid rgba(255,255,255,0.05);">', unsafe_allow_html=True)
+        st.markdown(f"<h1 style='text-align: center; margin-bottom: 2rem;'>{'Welcome back' if mode=='login' else 'Create Identity'}</h1>", unsafe_allow_html=True)
         
-        email = st.text_input("Email", placeholder="name@email.com", key=f"{mode}_email")
-        password = st.text_input("Password", type="password", placeholder="••••••••", key=f"{mode}_pass")
+        email = st.text_input("Corporate Email", placeholder="name@company.com", key=f"{mode}_email")
+        password = st.text_input("Secret Key", type="password", placeholder="••••••••", key=f"{mode}_pass")
         
         if mode == "signup":
-            if st.button("Get Started with Email"):
+            if st.button("Establish Identity"):
                 try:
                     res = supabase.auth.sign_up({"email": email, "password": password})
-                    st.success("✅ Success! Please check your email (and spam) for the link.")
-                except Exception as e: st.error(str(e))
+                    st.success("Verification packet sent. Check your secure inbox.")
+                except Exception as e: st.error(f"Handshake failed: {e}")
         else:
-            if st.button("Secure Login"):
+            if st.button("Access Mission Control"):
                 try:
                     res = supabase.auth.sign_in_with_password({"email": email, "password": password})
                     st.session_state.user = res.user
-                    navigate_to("dashboard")
-                    st.rerun()
-                except: st.error("Login failed. Check your credentials.")
+                    navigate_to("dashboard"); st.rerun()
+                except: st.error("Access denied. Invalid credentials.")
         
-        st.markdown("<br><p style='text-align:center;'>---</p>", unsafe_allow_html=True)
+        st.markdown("<br><p style='text-align:center; opacity: 0.3;'>———</p>", unsafe_allow_html=True)
         if mode == "login":
-            if st.button("No account? Sign up", key="go_signup"): navigate_to("signup"); st.rerun()
+            if st.button("New to the network? Join here", key="go_s"): navigate_to("signup"); st.rerun()
         else:
-            if st.button("Have an account? Log in", key="go_login"): navigate_to("login"); st.rerun()
+            if st.button("Existing identifier? Login", key="go_l"): navigate_to("login"); st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def render_dashboard():
-    st.markdown(f"# Mission Control")
-    st.write(f"Identity: **{st.session_state.user.email}**")
+    # Modern Dashboard Layout
+    st.markdown('<div style="padding: 4rem 10%;">', unsafe_allow_html=True)
+    st.markdown(f"<h1>Mission Control <span style='font-size: 1.2rem; color: {ACCENT};'>v1.0.4</span></h1>", unsafe_allow_html=True)
+    st.write(f"Authorized Participant: **{st.session_state.user.email}**")
     st.divider()
-    if st.button("Logout Dashboard", key="logout_dash"):
+    
+    m1, m2, m3 = st.columns(3)
+    with m1: st.metric("Portfolio Value", "$24,580", "+12.4%")
+    with m2: st.metric("Global Reach", "1.4M", "+3.1%")
+    with m3: st.metric("Trust Score", "9.8/10", "+0.2")
+
+    st.markdown('<div style="height: 100px;"></div>', unsafe_allow_html=True)
+    if st.button("Terminate Session", key="logout_dash"):
         supabase.auth.sign_out(); st.session_state.user = None; navigate_to("home"); st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def main():
-    if not supabase: st.error("Infrustructure Keys Missing")
+    if not supabase: st.error("Core Infrustructure Missing")
     render_navbar()
     if st.session_state.user and st.session_state.page != "home": render_dashboard(); return
     if st.session_state.page == "home": render_home()
