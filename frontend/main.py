@@ -5,7 +5,7 @@ from supabase import create_client, Client
 
 # Page Config
 st.set_page_config(
-    page_title="InfluencerHub | The Global Standard",
+    page_title="InfluencerHub | Standard",
     page_icon="💎",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -72,12 +72,13 @@ st.markdown(f"""
         }}
         div.stButton > button:hover {{
             background-color: #7C3AED !important;
+            transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(103, 76, 196, 0.4);
         }}
 
         /* Targeted Card Styling - Fixes Black Box */
         div[data-testid="stVerticalBlock"] > div[style*="border"] {{
-            background: rgba(15, 15, 15, 0.95) !important;
+            background: rgba(15, 15, 15, 0.9) !important;
             backdrop-filter: blur(30px) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             border-radius: 20px !important;
@@ -90,6 +91,16 @@ st.markdown(f"""
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 800;
+        }}
+
+        /* Auth Background Layer */
+        .page-bg {{
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+                        url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2601&auto=format&fit=crop');
+            background-size: cover;
+            z-index: -1;
         }}
     </style>
 """, unsafe_allow_html=True)
@@ -112,46 +123,36 @@ def render_navbar():
                 if st.button("Sign Up", key="nav_s"): navigate_to("signup")
 
 def render_home():
-    # Hero Section - Text Reverted to Original
+    # Hero Section - Restored to the "Elite/Scale" version
     st.markdown(f"""
-        <div style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+        <div style="background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), 
                     url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2672&auto=format&fit=crop');
-                    background-size: cover; background-position: center; padding: 14rem 10% 8rem 10%; text-align: center;">
-            <h1 style="font-size: 5.5rem; font-weight: 800; line-height: 1.1; margin: 0;">Turn Your Influence<br>Into Verified Income</h1>
-            <p style="font-size: 1.5rem; color: rgba(255,255,255,0.7); max-width: 800px; margin: 2rem auto 4rem auto;">
-                The all-in-one platform for creators. Everything you need to manage campaigns, payments, and growth.
+                    background-size: cover; background-position: center; padding: 14rem 10% 8rem 10%; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <h1 style="font-size: 5.5rem; font-weight: 800; line-height: 1.1; margin: 0;">SCALE YOUR</h1>
+            <h1 style="font-size: 5.5rem; font-weight: 800; line-height: 1.1; margin: 0.5rem 0 2rem 0; color: {ACCENT};">INFLUENCE</h1>
+            <p style="font-size: 1.5rem; color: rgba(255,255,255,0.7); max-width: 800px; margin: 0 auto 4rem auto;">
+                The institutional standard for managing creator campaigns and automated payouts worldwide.
             </p>
         </div>
     """, unsafe_allow_html=True)
     
-    if st.button("Start Now — It's Free", key="home_cta"):
+    if st.button("Get Started Today", key="home_cta"):
         navigate_to("signup")
 
-    # Values Section - Reverted to Original Notes
+    # Content Area
     st.markdown('<div style="padding: 6rem 10%;">', unsafe_allow_html=True)
-    c1, c2, c3 = st.columns(3, gap="large")
-    
+    c1, c2 = st.columns([1.2, 1], gap="large")
     with c1:
-        with st.container(border=True):
-            st.markdown("### 🌎 Global Reach")
-            st.markdown("Connect with brands across the world instantly.")
+        st.image("https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop", use_container_width=True)
     with c2:
-        with st.container(border=True):
-            st.markdown("### ⛓️ Smart Identity")
-            st.markdown("Your metrics are on-chain verified and secure.")
-    with c3:
-        with st.container(border=True):
-            st.markdown("### 💰 Instant Payouts")
-            st.markdown("Get paid the second your work is verified.")
+        st.markdown('<div style="margin-top: 3rem;">', unsafe_allow_html=True)
+        st.markdown('<h2 style="font-size: 3.5rem; margin-bottom: 1rem;">Global Ingest</h2>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size: 1.3rem; opacity: 0.7; margin-bottom: 2.5rem;">The boutique standard for performance tracking and verified earnings attribution.</p>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 def render_auth(mode="login"):
-    st.markdown(f"""
-        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
-                    background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
-                    url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2601&auto=format&fit=crop'); 
-                    background-size: cover;"></div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="page-bg"></div>', unsafe_allow_html=True)
     
     st.markdown("<div style='height: 10vh;'></div>", unsafe_allow_html=True)
     _, col, _ = st.columns([1, 1.2, 1])
@@ -161,27 +162,27 @@ def render_auth(mode="login"):
             st.markdown(f"<h1 style='text-align: center;'>{mode.capitalize()}</h1>", unsafe_allow_html=True)
             st.markdown(f"<p style='text-align: center; opacity: 0.5; margin-bottom: 2rem;'>InfluencerHub Secure Portal</p>", unsafe_allow_html=True)
             
-            email = st.text_input("Email", placeholder="email@example.com", key=f"id_{mode}", label_visibility="collapsed")
-            password = st.text_input("Password", placeholder="Password", type="password", key=f"tok_{mode}", label_visibility="collapsed")
+            email = st.text_input("Identity ID", placeholder="email@example.com", key=f"id_{mode}", label_visibility="collapsed")
+            password = st.text_input("Access Token", placeholder="Password", type="password", key=f"tok_{mode}", label_visibility="collapsed")
             
             st.markdown("<br>", unsafe_allow_html=True)
             if mode == "signup":
-                if st.button("Create Account", use_container_width=True):
+                if st.button("Establish Identity", use_container_width=True):
                     try:
                         supabase.auth.sign_up({"email": email, "password": password})
-                        st.success("✅ Verification email sent! Please check your inbox.")
+                        st.success("Verification packet sent.")
                     except Exception as e: st.error(str(e))
                 st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
-                if st.button("Already have an account? Login", use_container_width=True, key="to_login"): navigate_to("login")
+                if st.button("Return to Login", use_container_width=True, key="to_login"): navigate_to("login")
             else:
-                if st.button("Secure Login", use_container_width=True):
+                if st.button("Verify & Enter", use_container_width=True):
                     try:
                         res = supabase.auth.sign_in_with_password({"email": email, "password": password})
                         st.session_state.user = res.user
                         navigate_to("dashboard")
-                    except: st.error("Invalid credentials.")
+                    except: st.error("Access Denied.")
                 st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
-                if st.button("New here? Create Account", use_container_width=True, key="to_signup"): navigate_to("signup")
+                if st.button("Request Network Access", use_container_width=True, key="to_signup"): navigate_to("signup")
 
 def render_dashboard():
     st.markdown(f'<div style="padding: 5rem 10%; background: {DARK_BG}; min-height: 100vh;">', unsafe_allow_html=True)
