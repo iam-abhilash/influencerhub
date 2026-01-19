@@ -40,6 +40,15 @@ st.markdown(f"""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         
+        /* Remove top white space and streamlit header */
+        [data-testid="stHeader"] {{
+            display: none !important;
+        }}
+        .block-container {{
+            padding-top: 1rem !important;
+            padding-bottom: 0rem !important;
+        }}
+        
         .stApp {{
             background-color: #0B0E14;
             color: #E2E8F0;
@@ -54,17 +63,25 @@ st.markdown(f"""
             -webkit-text-fill-color: transparent;
             font-weight: 800;
             letter-spacing: -0.05em;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
+            display: inline-block;
         }}
 
-        /* Fix the "Pathetic" Bars (Input Fields) */
+        /* Fix Inputs: Black text on white/light background as requested */
         .stTextInput input {{
-            background-color: rgba(255, 255, 255, 0.05) !important;
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: white !important;
             border-radius: 12px !important;
             padding: 12px !important;
+            font-weight: 500 !important;
         }}
+        .stTextInput label {{
+            color: #8B949E !important;
+            font-weight: 600 !important;
+            margin-bottom: 8px !important;
+        }}
+        
         .stTextInput input:focus {{
             border-color: {PRIMARY} !important;
             box-shadow: 0 0 0 1px {PRIMARY} !important;
@@ -85,12 +102,13 @@ st.markdown(f"""
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(103, 76, 196, 0.4) !important;
             background: #7C3AED !important;
+            color: white !important;
         }}
 
-        /* Secondary/Ghost Buttons */
-        div[data-testid="stButton"] button:not([key*="primary"]) {{
+        /* Ghost Buttons for secondary actions */
+        div[data-testid="stButton"] button[key*="secondary"] {{
             background: transparent !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
         }}
         
         /* Auth Container Sizing */
@@ -99,16 +117,19 @@ st.markdown(f"""
             border: 1px solid rgba(255,255,255,0.05);
             padding: 3rem;
             border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            margin-top: 2rem;
         }}
         
+        /* Hide decoration stripe */
+        div[data-testid="stDecoration"] {{
+            display: none !important;
+        }}
     </style>
 """, unsafe_allow_html=True)
 
 def navigate_to(page_name):
     st.session_state.page = page_name
-    # st.rerun() is often redundant in callbacks and causes a no-op warning.
-    # We will let Streamlit's natural rerun handle it after the state change.
 
 def render_navbar():
     cols = st.columns([3, 6, 2])
@@ -116,77 +137,81 @@ def render_navbar():
         st.markdown('<p class="logo-text">InfluencerHub</p>', unsafe_allow_html=True)
     with cols[2]:
         if st.session_state.user:
-            if st.button("Log Out", key="nav_logout_btn"):
+            if st.button("Log Out", key="logout_btn_nav"):
                 supabase.auth.sign_out()
                 st.session_state.user = None
                 navigate_to("home")
                 st.rerun()
         elif st.session_state.page == "home":
-             if st.button("Log In", key="nav_login_top"):
+             if st.button("Log In", key="login_btn_nav"):
                  navigate_to("login")
                  st.rerun()
 
 def render_home():
-    st.markdown('<div style="text-align: center; padding: 6rem 0;">', unsafe_allow_html=True)
+    st.markdown('<div style="text-align: center; padding: 4rem 0;">', unsafe_allow_html=True)
     st.markdown('<h1 style="font-size: 5rem; line-height: 1;">THE POWERHOUSE<br><span style="color: #A78BFA">FOR INFLUENCERS.</span></h1>', unsafe_allow_html=True)
     st.markdown('<p style="font-size: 1.4rem; color: #94A3B8; margin: 2rem 0;">Automate campaigns, handle massive payments, and secure your brand.</p>', unsafe_allow_html=True)
     
     c1, c2, c3 = st.columns([1,1,1])
     with c2:
-        if st.button("Start Your Journey", key="hero_start_primary"):
+        if st.button("Start Your Journey", key="hero_signup_btn"):
             navigate_to("signup")
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
 def render_auth(mode="login"):
-    # Center the form using columns
     _, col, _ = st.columns([1, 1.2, 1])
     with col:
         st.markdown(f'<div class="auth-box">', unsafe_allow_html=True)
         st.markdown(f"<h2 style='text-align: center;'>{'Sign In' if mode=='login' else 'Create Account'}</h2>", unsafe_allow_html=True)
-        st.markdown(f"<p style='text-align: center; color: #8B949E; margin-bottom: 2rem;'>Join the elite network of creators.</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align: center; color: #8B949E; margin-bottom: 2rem;'>The elite network for creators.</p>", unsafe_allow_html=True)
         
-        email = st.text_input("Email Address", placeholder="name@email.com")
-        password = st.text_input("Password", type="password", placeholder="••••••••")
+        email = st.text_input("Email Address", placeholder="name@email.com", key=f"{mode}_email")
+        password = st.text_input("Password", type="password", placeholder="••••••••", key=f"{mode}_pass")
         
         if mode == "signup":
-            if st.button("Create Account", key="auth_signup_primary"):
+            if st.button("Register with Email", key="auth_signup_submit"):
                 try:
+                    # Explicitly using password login to avoid confusion
                     res = supabase.auth.sign_up({"email": email, "password": password})
-                    st.success("Verification link sent! Check your inbox.")
-                except Exception as e: st.error(str(e))
+                    st.success("✅ Success! Please check your email inbox (and spam folder) for the verification link.")
+                    st.info("Note: Free accounts have limited emails per hour. If it doesn't arrive, wait 5 mins or try a different email.")
+                except Exception as e: 
+                    st.error(f"Error: {str(e)}")
         else:
-            if st.button("Log In to Dashboard", key="auth_login_primary"):
+            if st.button("Log In to Dashboard", key="auth_login_submit"):
                 try:
                     res = supabase.auth.sign_in_with_password({"email": email, "password": password})
                     st.session_state.user = res.user
                     navigate_to("dashboard")
                     st.rerun()
-                except Exception as e: st.error("Invalid login. Try again.")
+                except Exception as e: 
+                    st.error("Invalid credentials or unverified email. Check your link!")
         
         st.markdown("<br>", unsafe_allow_html=True)
         if mode == "login":
-            if st.button("Don't have an account? Sign Up"):
+            if st.button("Don't have an account? Sign Up", key="goto_signup_secondary"):
                 navigate_to("signup")
                 st.rerun()
         else:
-            if st.button("Already have an account? Log In"):
+            if st.button("Already have an account? Log In", key="goto_login_secondary"):
                 navigate_to("login")
                 st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
 def render_dashboard():
     st.markdown(f"# Welcome, Creator.")
-    st.write(f"Secure Identity: {st.session_state.user.email}")
+    st.write(f"Identity: **{st.session_state.user.email}**")
     st.divider()
-    if st.button("Logout", key="dash_logout"):
+    if st.button("Logout Session", key="logout_dash_btn"):
         supabase.auth.sign_out()
         st.session_state.user = None
         navigate_to("home")
+        st.rerun()
 
 def main():
     if not supabase:
-        st.error("Configuration Error. Please check SUPABASE keys.")
+        st.error("Infrastructure Error: Missing configuration keys.")
         return
 
     render_navbar()
